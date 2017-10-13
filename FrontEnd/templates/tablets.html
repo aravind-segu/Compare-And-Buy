@@ -1,0 +1,148 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class = "container">
+                <div class="row">
+                <form class = "form-inline" method="GET" action="/search">
+                <div class="col-md-8">
+                    <div class="input-group col-md-8" style="margin-bottom:10px">
+                        <span class="input-group-addon" id="basic-addon1">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </span>
+                        <input type="text" name="searchIn" value="{{request.form.search}}" id ="searchInput" class="form-control" placeholder="Search" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                        <button type="submit" value = "{{type}}" name="searchBtn" class="btn btn-success" style="width:250px;background-color:#1995AD;border-color:#1995AD">Search</button>
+                </div>
+                </form>
+            </div>
+            {% for tablet in tabletsList %}
+                <br>
+                <br>
+                <div class="panel panel-default">
+                    {% for model in tablet %}
+                        {% if loop.index == 1%}
+                     <div class="panel-heading" style="background-color:#F1F1F2">
+                        <div class = "media">
+                            <div class="media-left">
+                                <img src="{{tablet[loop.index0]['Image']}}" class="media-object" style="max-width:200px">
+                            </div>
+                            <div class="media-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h3 class="media-heading" style="color:#1995AD"><b>{{tablet[loop.index0]['Name']}}</b></h3>
+                                    </div>
+                                     <div class="col-md-4">
+                                          {% if model['Website'] == "amazon" %}
+                                            <img src="http://www.pngpix.com/wp-content/uploads/2016/07/PNGPIX-COM-Amazon-Com-Logo-PNG-Transparent.png" class="media-object" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "source" %}
+                                            <img src="http://coolcanucks.ca/wp-content/uploads/2009/12/thesource.coolcanucks.ca3.png" class="media-object" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "bestbuy" %}
+                                            <img src="http://logos-download.com/wp-content/uploads/2016/02/Best_Buy_blue_logo_alternative.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "newegg" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/0/00/Newegg_Logo_updated.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "flipkart" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/c/c9/Flipkart_logo.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "snapdeal" %}
+                                            <img src="http://logos-download.com/wp-content/uploads/2016/10/SnapDeal_logo_Snap_Deal.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "staples" %}
+                                            <img src="http://www.couponingnerd.com/default/assets/Image/storelogos/staplesimage.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "walmart" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Walmart_logo.svg/2000px-Walmart_logo.svg.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         <h3 style="color:#1995AD"><b>{{tablet[loop.index0]['Price']}}</b></h3>
+                                         <a href="{{tablet[loop.index0]['Link']}}" target="_blank" >
+                                            <button type="button" class="btn btn-success" style="width:250px;background-color:#1995AD;border-color:#1995AD">Get It</button>
+                                         </a>
+                                </div>
+                             </div>
+                            </div>
+                        </div>
+                     </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="panel-body" style="background-color:#E0E0E0">
+                     <ul class="list-group">
+                         {% for model in tablet %}
+                          {% if loop.index != 1 %}
+                         <a href = "{{model['Link']}}" style="text-decoration:none" target="_blank">
+                             <li class="list-group-item" style="background-color:#E0E0E0; border-color:#A9A9A9">
+                                 <div class="media">
+                                     <div class="media-left">
+                                         {% if model['Website'] == "amazon" %}
+                                            <img src="http://www.pngpix.com/wp-content/uploads/2016/07/PNGPIX-COM-Amazon-Com-Logo-PNG-Transparent.png" class="media-object" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "source" %}
+                                            <img src="http://coolcanucks.ca/wp-content/uploads/2009/12/thesource.coolcanucks.ca3.png" class="media-object" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "bestbuy" %}
+                                            <img src="http://logos-download.com/wp-content/uploads/2016/02/Best_Buy_blue_logo_alternative.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "newegg" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/0/00/Newegg_Logo_updated.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "flipkart" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/en/c/c9/Flipkart_logo.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "snapdeal" %}
+                                            <img src="http://logos-download.com/wp-content/uploads/2016/10/SnapDeal_logo_Snap_Deal.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "staples" %}
+                                            <img src="http://www.couponingnerd.com/default/assets/Image/storelogos/staplesimage.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                         {% if model['Website'] == "walmart" %}
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Walmart_logo.svg/2000px-Walmart_logo.svg.png" style="max-width:100px; max-height:48px">
+                                         {% endif %}
+                                     </div>
+                                     <div class="media-body">
+                                         <div class="row">
+                                             <div class="col-md-8">
+                                                 <h4 class = "media-heading" style="color:#1995AD">
+                                                     <b>{{model['Name']}}</b>
+                                                 </h4>
+                                             </div>
+                                             <div class="col-md-4">
+                                                 <h4 class = "media-heading" style="color:#1995AD">
+                                                     <b>
+                                                     {{model['Price']}}
+                                                     </b>
+                                                 </h4>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                            </li>
+                         </a>
+                    {% endif %}
+                         {% endfor %}
+                     </ul>
+                    </div>
+
+                 </div>
+                <br>
+                <br>
+            {% endfor %}
+    <ul class="pager">
+        {% if page == 1 %}
+        <li class="previous disabled"><a style="background-color:#1995AD; color:white; border-color:#1995AD" href="#"><span aria-hidden="true">&larr;</span> Back</a></li>
+        {% endif %}
+        {% if page != 1 %}
+        <li class="previous"><a style="background-color:#1995AD; color:white;border-color:#1995AD"href="/{{type}}/page/{{page-1}}"><span aria-hidden="true">&larr;</span> Back</a></li>
+        {% endif %}
+        {% if page == max %}
+        <li class="next disabled"><a style="background-color:#1995AD; color:white;border-color:#1995AD" href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
+        {% endif %}
+        {% if page != max %}
+        <li class="next"><a style="background-color:#1995AD; color:white;border-color:#1995AD" href="/{{type}}/page/{{page+1}}">Next <span aria-hidden="true">&rarr;</span></a></li>
+        {% endif %}
+  </ul>
+</div>
+{% endblock %}

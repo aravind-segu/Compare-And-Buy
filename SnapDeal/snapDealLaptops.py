@@ -5,7 +5,15 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import pymysql
 
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `laptops`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 price = []
 title =[]
 link = []
@@ -67,12 +75,23 @@ for element in all_elements:
     productName = nameTag.get("title")
     priceTag = element.find("span", {"class":"product-price"})
     productPrice = priceTag.get("data-price")
+    productModel = findModel(productLink, counter)
+    print productName
+    print productPrice
+    print productLink
+    print productImage
+    print productModel
+    vendor = "snapdeal"
+    cursor.execute(
+        "INSERT into laptops(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+        (productName, priceTag.text.strip(), productLink, productModel, productImage, vendor))
     price.append(productPrice)
     title.append(productName)
     link.append(productLink)
     image.append(productImage)
-    findModel(productLink , counter)
 
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

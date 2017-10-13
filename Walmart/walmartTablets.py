@@ -4,6 +4,15 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `tablets`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 
 def findModel (productLink, browser):
     browser.get(productLink)
@@ -38,7 +47,14 @@ def getInformation(soup):
         # print productName
         # print productImage
         productModel = findModel(productLink, browserModel)
-        print productModel
+        vendor = "walmart"
+        try:
+            cursor.execute(
+                "INSERT into tablets(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                (productName, priceTag.text.strip(), productLink, productModel, productImage, vendor))
+        except:
+            print "SQL Exception"
+            continue
         modelNumber.append(productModel)
         price.append(priceTag.text)
         title.append(productName)
@@ -65,6 +81,8 @@ html = browser.page_source
 soupWindows = BeautifulSoup(html)
 getInformation(soupWindows)
 
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

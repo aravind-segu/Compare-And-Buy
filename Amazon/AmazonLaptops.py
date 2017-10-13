@@ -12,7 +12,14 @@ import urllib2
 import pandas as pd
 from selenium import webdriver
 import requests
+import pymysql
 
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `laptops`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
 links = []
 images =[]
 name = []
@@ -98,6 +105,17 @@ class scrape():
                         modelNumber = scrape.findModel(self,productLink.get("href"), threadNum)
                         print str(counter) + " " + productLink.get("href") + " " + modelNumber
                         with scrape.add_lock:
+                            productName = image.get("alt")
+                            link = productLink.get("href")
+                            productImage = image.get("src")
+                            vendor = "amazon"
+                            print modelNumber
+                            print productName
+                            print link
+                            print price
+                            cursor.execute(
+                                "INSERT into laptops(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                                (productName, price, link, modelNumber, productImage, vendor))
                             model.append(modelNumber)
                             images.append(image.get("src"))
                             name.append(image.get("alt"))
@@ -139,7 +157,8 @@ difference = len(name) - len(model)
 while (difference > 0):
     model.append("none")
     difference -= 1
-
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(name)))
 df["Name"] = name

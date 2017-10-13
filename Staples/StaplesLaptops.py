@@ -7,6 +7,15 @@ from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import threading
 import sys
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `laptops`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 price = []
@@ -81,6 +90,14 @@ class scrapingThread (threading.Thread):
                 span = div.find("span", {"property":"price"})
                 productPrice = span.text
                 with scrapingThread.addLock:
+                    print productName
+                    print productLink
+                    print imageLink
+                    print productPrice
+                    vendor = "staples"
+                    cursor.execute(
+                        "INSERT into laptops (Name, Price, Link, ModelNumber, Images, Vendor) VALUES('%s', '%s', '%s', '%s', '%s', '%s')" % (
+                            productName, productPrice, productLink, modelNumberPro, imageLink, vendor))
                     title.append(productName)
                     link.append(productLink)
                     images.append(imageLink)
@@ -128,6 +145,8 @@ thread1.join()
 #thread2.join()
 #thread3.join()
 
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'IDValues', range(0, len(title)))
 df["Name"] = title

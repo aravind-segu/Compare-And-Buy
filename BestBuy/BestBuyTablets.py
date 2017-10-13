@@ -4,7 +4,15 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 import requests
+import pymysql
 
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `tablets`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 price = []
 title =[]
 link = []
@@ -19,10 +27,16 @@ def findModel(link):
     page = opener.open(link)
     soup = BeautifulSoup(page)
     span = soup.find("span", {"id":"ctl00_CP_ctl00_PD_lblModelNumber"})
+    imageDiv = soup.find("div", {"data-bby-media-container":"primaryMediaContainer"})
+    #print imageDiv
+    image = imageDiv.find("img")
+    #print image
+    print link + " " + image.get("src")
+    image.append(image.get("src"))
     if not span:
-        modelNumber.append("none")
+        return ("none",image.get("src"))
     else:
-        modelNumber.append(span.text)
+        return (span.text, image.get("src"))
 class getPages:
     y = 0
     def getPage(self, pageNumber):
@@ -72,9 +86,21 @@ class scrapingThread (threading.Thread):
                     print h4.text
                     urlLink = ("http://www.bestbuy.ca" + h4.find("a").get("href"))
                     with scrapingThread.add_lock:
+                        modelNumber,images = findModel(urlLink)
+                        name = h4.text
+                        prices = div.find("span", {"class": "amount"}).text
+                        print h4.text
+                        print urlLink
+                        print images
+                        print modelNumber
+                        print prices
+                        vendor = "bestbuy"
+                        cursor.execute(
+                            "INSERT into tablets(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                            (name, prices, urlLink, modelNumber, images, vendor))
+
                         image.append(images)
                         title.append(h4.text)
-                        findModel(urlLink)
                         link.append(urlLink)
                         price.append(div.find("span", {"class": "amount"}).text)
                     print x
@@ -115,6 +141,8 @@ thread7.join()
 thread8.join()
 thread9.join()
 thread10.join()
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title
@@ -123,5 +151,5 @@ df["Link"] = link
 df["ModelNumber"] = modelNumber
 df["Images"] = image
 print modelNumber
-df.to_csv("BestBuy.csv",index=False, encoding='utf-8')
+df.to_csv("BestBuyTablets.csv",index=False, encoding='utf-8')
 

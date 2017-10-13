@@ -11,6 +11,14 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `tablets`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -130,6 +138,11 @@ class scrape ():
                 print "entered adding"
                 print productName
                 with scrape.add_lock:
+                    vendor = "newegg"
+                    productModel = "none"
+                    cursor.execute(
+                        "INSERT into tablets(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                        (productName, totalPrice, productLink, productModel, image, vendor))
                     title.append(productName)
                     link.append(productLink)
                     price.append(totalPrice)
@@ -203,6 +216,8 @@ while (pageNumber <= 5):
 # # thread8.join()
 # # thread9.join()
 # # thread10.join()
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

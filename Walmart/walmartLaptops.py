@@ -5,6 +5,15 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import threading
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `laptops`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 price = []
 title =[]
 link = []
@@ -70,6 +79,14 @@ class scrape():
             print str(count) + " " + productModel
             count += 1
             with scrape.add_lock:
+                vendor = "walmart"
+                try:
+                    cursor.execute(
+                        "INSERT into laptops(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                        (productName, priceTag.text.strip(), productLink, productModel, productImage, vendor))
+                except:
+                    print "SQL Exception"
+                    continue
                 modelNumber.append(productModel)
                 price.append(priceTag.text)
                 title.append(productName)
@@ -104,7 +121,8 @@ t3.join()
 t4.join()
 t5.join()
 
-
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class = "container">
+                <div class="row">
+                <form class = "form-inline" method="GET" action="search">
+                <div class="col-md-8">
+                    <div class="input-group" style="margin-bottom:10px">
+                        <span class="input-group-addon" id="basic-addon1">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </span>
+                        <input type="text" name="searchIn" value="{{request.form.search}}" id ="searchInput" class="form-control" placeholder="Search" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                        <button type="submit" value = "{{type}}" name="searchBtn" class="btn btn-success" style="width:250px;background-color:#1995AD;border-color:#1995AD">Search</button>
+                </div>
+                </form>
+            </div>
+             <div class="panel panel-default">
+                   <div class="panel-heading" style="background-color:#F1F1F2">
+                       <h3 class="media-heading" style="color:#1995AD"><b>No Results Found</b></h3>
+                   </div>
+             </div>
+</div>
+{% endblock %}

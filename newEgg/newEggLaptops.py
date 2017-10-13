@@ -11,6 +11,15 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `laptops`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -92,8 +101,8 @@ class scrape ():
             if threadNum is 4:
                 browserGetInfo = browser4
             url = "https://www.newegg.ca/Laptops-Notebooks/SubCategory/ID-32/Page-" + str(pageNumber) + "?Tid=6741&PageSize=96&order=BESTMATCH"
-            time.sleep(10)
             browserGetInfo.get(url)
+            time.sleep(20)
             html = browserGetInfo.page_source
             soup = BeautifulSoup(html)
             allDivs = soup.findAll("div", {"class": "item-container"})
@@ -121,6 +130,18 @@ class scrape ():
                     totalPrice = strong.text + sup.text
                 except:
                     continue
+                try:
+                    modelUL = div.find("ul", {"class": "item-features"})
+                    childLi = modelUL.findAll("li")
+                    productModel = "none"
+                    for li in childLi:
+                        if ("model" in str(li.find("strong").text).lower()):
+                            productModel = li.text
+                            productModel = productModel.replace("Model #: ", "")
+                            print productModel
+                            break
+                except:
+                    continue
                 # print totalPrice
                 # print x
                 # print
@@ -129,6 +150,11 @@ class scrape ():
                 print "entered adding"
                 print productName
                 with scrape.add_lock:
+                    vendor = "newegg"
+                    # productModel = "none"
+                    cursor.execute(
+                        "INSERT into laptops(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                        (productName, totalPrice, productLink, productModel, image, vendor))
                     title.append(productName)
                     link.append(productLink)
                     price.append(totalPrice)
@@ -142,22 +168,22 @@ class scrape ():
             return "success"
         except:
             printException()
-while (pageNumber <= 25):
+while (pageNumber <= 30):
     sc = scrape()
     pageNumber += 1
-    if (pageNumber > 25):
+    if (pageNumber > 30):
         break
     t1 = threading.Thread(target=scrape.getInformation, args=(sc, pageNumber, 1,))
     pageNumber += 1
-    if (pageNumber > 25):
+    if (pageNumber > 30):
         break
     t2 = threading.Thread(target=scrape.getInformation, args=(sc, pageNumber, 2,))
     pageNumber += 1
-    if (pageNumber > 25):
+    if (pageNumber > 30):
         break
     t3 = threading.Thread(target=scrape.getInformation, args=(sc, pageNumber, 3,))
     pageNumber += 1
-    if (pageNumber > 25):
+    if (pageNumber > 30):
         break
     t4 = threading.Thread(target=scrape.getInformation, args=(sc, pageNumber, 4,))
     t1.start()
@@ -202,6 +228,8 @@ while (pageNumber <= 25):
 # # thread8.join()
 # # thread9.join()
 # # thread10.join()
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

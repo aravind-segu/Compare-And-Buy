@@ -5,6 +5,15 @@ import threading
 import sys
 from bs4 import BeautifulSoup
 import pandas as pd
+import pymysql
+
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `tablets`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
+print(countrow)
 
 price = []
 title =[]
@@ -90,6 +99,14 @@ class scrapingThread (threading.Thread):
                 priceItem = allSpan[0].text
                 modelNumberItem = findModel(urlLink)
                 with scrapingThread.add_lock:
+                    vendor = "source"
+                    print name
+                    print urlLink
+                    print priceItem
+                    print modelNumberItem
+                    print imageLink
+                    cursor.execute("INSERT into tablets(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                                   (name, priceItem, urlLink, modelNumberItem, imageLink, vendor))
                     title.append(name)
                     link.append(urlLink)
                     price.append(priceItem)
@@ -116,6 +133,8 @@ thread2.join()
 thread3.join()
 thread4.join()
 
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title

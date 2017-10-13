@@ -9,7 +9,14 @@ priceList = []
 title =[]
 linkList = []
 modelNumber = []
+import pymysql
 
+conn = pymysql.connect(host='localhost', user='root', db='productdata')
+conn.set_charset('utf8')
+cursor = conn.cursor()
+sql = 'SELECT * from `tablets`;'
+cursor.execute(sql)
+countrow = cursor.execute(sql)
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -84,6 +91,11 @@ class scrapingThread (threading.Thread):
                 print productPrice
                 productModel = findModel(productLink)
                 with scrapingThread.add_lock:
+                    productImage = "https://fastandfriendly.us/wp-content/uploads/2017/07/IMAGE-COMING-SOON.png"
+                    vendor = "flipkart"
+                    cursor.execute(
+                        "INSERT into tablets(Name, Price, Link, ModelNumber, Images, Vendor) VALUES ('%s', '%s', '%s', '%s','%s', '%s')" % \
+                        (productName, productPrice, productLink, productModel, productImage, vendor))
                     priceList.append(productPrice)
                     title.append(productName)
                     linkList.append(productLink)
@@ -118,6 +130,8 @@ thread6.join()
 thread7.join()
 thread8.join()
 
+conn.commit()
+conn.close()
 df = pd.DataFrame()
 df.insert(0, 'ID', range(0, len(title)))
 df["Name"] = title
